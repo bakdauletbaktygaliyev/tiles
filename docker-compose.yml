@@ -8,6 +8,11 @@ services:
     ports: ["5432:5432"]
     volumes:
       - tiles:/var/lib/postgresql/data
+  osmium:
+    image: iboates/osmium:1.19.0
+    volumes:
+      - ./data:/data
+    working_dir: /data
 volumes:
   tiles:
 
