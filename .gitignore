@@ -4,6 +4,16 @@
 
 .idea/
 
+.learning/
+
+.env
+
+/tiles
+
+/bin/
+
+data/
+
 CLAUDE.md
 
 PET.md

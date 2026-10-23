@@ -1,0 +1,36 @@
+services:
+  db:
+    image: imresamu/postgis:17-3.6
+    environment:
+      POSTGRES_USER: tiles
+      POSTGRES_PASSWORD: tiles
+      POSTGRES_DB: tiles
+    ports: ["5432:5432"]
+    volumes:
+      - tiles:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tiles -d tiles"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  osmium:
+    image: iboates/osmium:1.19.0
+    profiles: ["tools"]
+    volumes:
+      - ./data:/data
+    working_dir: /data
+  osm2pgsql:
+    image: iboates/osm2pgsql:2.1.1
+    profiles: ["tools"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: tiles
+    volumes:
+      - ./data:/data
+      - ./config:/config:ro
+    working_dir: /data
+volumes:
+  tiles:
+
