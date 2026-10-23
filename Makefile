@@ -2,9 +2,10 @@ COMPOSE   ?= docker compose
 SOURCE    ?= kazakhstan-latest.osm.pbf
 SOURCE_URL ?= https://download.geofabrik.de/asia/kazakhstan-latest.osm.pbf
 REGION    ?= almaty.osm.pbf
-BBOX      ?= 76.75,43.12,77.15,43.42
+BBOX ?= 76.529388,43.132059,77.343750,43.389082
 FLEX_CONFIG ?= /config/roads.lua
 
+# BBOX      ?= 76.75,43.12,77.15,43.42
 DB_USER ?= tiles
 DB_NAME ?= tiles
 
@@ -34,15 +35,13 @@ download:
 info:
 	$(COMPOSE) --profile tools run --rm osmium fileinfo $(REGION)
 
-
-import: up
-	$(COMPOSE) --profile tools run --rm osm2pgsql \
-		-H db -U $(DB_USER) -d $(DB_NAME) -O flex -S $(FLEX_CONFIG) /data/$(REGION)
-
 extract:
 	$(COMPOSE) --profile tools run --rm osmium extract \
 		--set-bounds -b $(BBOX) $(SOURCE) -o $(REGION) --overwrite
 
+import: up
+	$(COMPOSE) --profile tools run --rm osm2pgsql \
+		-H db -U $(DB_USER) -d $(DB_NAME) -O flex -S $(FLEX_CONFIG) /data/$(REGION)
 
 psql:
 	$(COMPOSE) exec db psql -U $(DB_USER) -d $(DB_NAME)
