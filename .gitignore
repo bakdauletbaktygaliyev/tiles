@@ -6,6 +6,12 @@
 
 .learning/
 
+.env
+
+/tiles
+
+/bin/
+
 data/
 
 CLAUDE.md
