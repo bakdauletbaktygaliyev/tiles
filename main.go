@@ -11,7 +11,8 @@ import (
 func main() {
 	url := os.Getenv("DATABASE_URL")
 	if url == "" {
-		url = "postgres://tiles:tiles@localhost:5432/tiles"
+		fmt.Fprintln(os.Stderr, "DATABASE_URL is not set")
+		os.Exit(1)
 	}
 
 	ctx := context.Background()
@@ -29,5 +30,5 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Print("Rows in highways table: ", n)
+	fmt.Println("Rows in highways table: ", n)
 }
