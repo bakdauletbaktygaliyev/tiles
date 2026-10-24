@@ -3,7 +3,7 @@ SOURCE    ?= kazakhstan-latest.osm.pbf
 SOURCE_URL ?= https://download.geofabrik.de/asia/kazakhstan-latest.osm.pbf
 REGION    ?= almaty.osm.pbf
 BBOX ?= 76.529388,43.132059,77.343750,43.389082
-FLEX_CONFIG ?= /config/roads.lua
+FLEX_CONFIG ?= /config/base.lua
 TEST_DATABASE_URL ?= postgres://tiles:tiles@localhost:5432/tiles
 DATABASE_URL ?= postgres://tiles:tiles@localhost:5432/tiles
 
