@@ -114,12 +114,24 @@ local function landuse_kind(tags)
     return nil
 end
 
+local name_keys = {
+    'name:kk', 'name:ru', 'name:en', 'name',
+}
+
+local function first_of(tags, keys)
+    for _, v in ipairs(keys) do
+        if tags[v] and tags[v] ~= '' then
+            return tags[v]
+        end
+    end
+end
+
 ---@diagnostic disable-next-line: undefined-global
 function osm2pgsql.process_relation(object)
     local tags = object.tags
     if tags.type == 'boundary' and tags.boundary == 'administrative' then
         boundaries:insert({
-            name = tags.name,
+            name = first_of(tags, name_keys),
             admin_level = tags.admin_level,
             geom = object:as_multilinestring()
         })
@@ -131,7 +143,7 @@ function osm2pgsql.process_way(object)
     local tags = object.tags
     if tags.highway then
         highways:insert({
-            name = tags.name,
+            name = first_of(tags, name_keys),
             highway = tags.highway,
             geom = object:as_linestring()
         })
@@ -139,7 +151,7 @@ function osm2pgsql.process_way(object)
 
     if tags.building and object.is_closed then
         buildings:insert({
-            name = tags.name,
+            name = first_of(tags, name_keys),
             building = tags.building,
             geom = object:as_polygon()
         })
@@ -148,7 +160,7 @@ function osm2pgsql.process_way(object)
     local kind = water_kind(tags)
     if kind then
         water:insert({
-            name = tags.name,
+            name = first_of(tags, name_keys),
             kind = kind,
             geom = object:as_polygon()
         })
@@ -157,7 +169,7 @@ function osm2pgsql.process_way(object)
     kind = landuse_kind(tags)
     if kind then
         landuse:insert({
-            name = tags.name,
+            name = first_of(tags, name_keys),
             kind = kind,
             geom = object:as_polygon()
         })
@@ -169,7 +181,7 @@ function osm2pgsql.process_node(object)
     local tags = object.tags
     if tags.place then
         places:insert({
-            name = tags.name,
+            name = first_of(tags, name_keys),
             place = tags.place,
             population = tags.population,
             geom = object:as_point()
