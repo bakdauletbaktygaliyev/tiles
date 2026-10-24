@@ -57,6 +57,17 @@ local places = osm2pgsql.define_table({
     }
 })
 
+---@diagnostic disable-next-line: undefined-global
+local boundaries = osm2pgsql.define_table({
+    name = 'boundaries',
+    ids = { type = 'relation', id_column = 'osm_id' },
+    columns = {
+        { column = 'name',        type = 'text' },
+        { column = 'admin_level', type = 'int' },
+        { column = 'geom',        type = 'multilinestring', projection = 3857, not_null = true }
+    }
+})
+
 local function water_kind(tags)
     if tags.natural == 'water' then
         return tags.water or 'water'
@@ -101,6 +112,18 @@ local function landuse_kind(tags)
     end
 
     return nil
+end
+
+---@diagnostic disable-next-line: undefined-global
+function osm2pgsql.process_relation(object)
+    local tags = object.tags
+    if tags.type == 'boundary' and tags.boundary == 'administrative' then
+        boundaries:insert({
+            name = tags.name,
+            admin_level = tags.admin_level,
+            geom = object:as_multilinestring()
+        })
+    end
 end
 
 ---@diagnostic disable-next-line: undefined-global
