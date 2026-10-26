@@ -2,14 +2,22 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"testing"
 
 	"github.com/jackc/pgx/v5"
 )
 
-func TestHighwaysLoad(t *testing.T) {
+var tables = []string{
+	"highways",
+	"buildings",
+	"water",
+	"landuse",
+	"places",
+	"boundaries",
+}
+
+func TestTablesHaveRows(t *testing.T) {
 	url := os.Getenv("TEST_DATABASE_URL")
 	if url == "" {
 		t.Skip("TEST_DATABASE_URL not set")
@@ -22,15 +30,19 @@ func TestHighwaysLoad(t *testing.T) {
 	}
 	defer conn.Close(ctx)
 
-	var n int64
-	err = conn.QueryRow(ctx, "SELECT count(*) FROM highways").Scan(&n)
-	if err != nil {
-		t.Fatalf("query: %v", err)
-	}
+	for _, table := range tables {
+		t.Run(table, func(t *testing.T) {
+			var n int64
+			err := conn.QueryRow(ctx, "SELECT count(*) FROM "+table).Scan(&n)
+			if err != nil {
+				t.Fatalf("query %s: %v", table, err)
+			}
 
-	if n == 0 {
-		t.Fatal("expected highways, got none")
-	}
+			if n == 0 {
+				t.Fatalf("table %s is empty", table)
+			}
 
-	fmt.Println("Rows in highways table: ", n)
+			t.Logf("rows in %s: %d", table, n)
+		})
+	}
 }
